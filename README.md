@@ -1,7 +1,7 @@
 How Bookit works? (will work)
 Anyone can create own booking service related to his buisness.
 
-## Features:
+## Planned features:
 
 - add available booking to selected date
 - auto fill bookings in selected time spans
@@ -10,6 +10,11 @@ Anyone can create own booking service related to his buisness.
 
 Client just enter your service app, select available booking, enter required data and confirm.
 
-## Tech
+## Tech - T3 stack
 
-[T3 Stack](https://create.t3.gg/)
+- Next.js
+- trpc
+- Prisma ORM
+- NextAuth
+- TailwindCSS
+- PlanetScale mysql DB
