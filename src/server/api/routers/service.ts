@@ -1,6 +1,7 @@
-import { prisma } from "../../db";
+import { addHours, eachDayOfInterval } from "date-fns";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { z } from "zod";
+import type { Slot } from "@prisma/client";
 
 export const serviceRouter = createTRPCRouter({
   createService: protectedProcedure
@@ -11,10 +12,9 @@ export const serviceRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      await prisma.service.create({
+      await ctx.prisma.service.create({
         data: {
           autoBookingAccept: false,
-          bookingTitle: "",
           description: "",
           isActive: false,
           name: input.name,
@@ -22,5 +22,76 @@ export const serviceRouter = createTRPCRouter({
           ownerId: ctx.session.user.id,
         },
       });
+    }),
+  setDescription: protectedProcedure
+    .input(z.object({ description: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.service.update({
+        where: { id: ctx.session.user.serviceId },
+        data: { description: input.description },
+      });
+    }),
+  setContact: protectedProcedure
+    .input(z.object({ phone: z.number(), email: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.service.update({
+        where: { id: ctx.session.user.serviceId },
+        data: { phoneNumber: input.phone, email: input.email },
+      });
+    }),
+  setAutoBookingAccept: protectedProcedure
+    .input(z.object({ newState: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.service.update({
+        where: { id: ctx.session.user.serviceId },
+        data: { autoBookingAccept: input.newState },
+      });
+    }),
+  setIsActive: protectedProcedure
+    .input(z.object({ newState: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.service.update({
+        where: { id: ctx.session.user.serviceId },
+        data: { isActive: input.newState },
+      });
+    }),
+  addFreeSlot: protectedProcedure
+    .input(
+      z.object({
+        date: z.date(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.slot.create({
+        data: {
+          date: input.date,
+          isFree: true,
+          serviceId: ctx.session.user.serviceId,
+        },
+      });
+    }),
+  fillFreeSlots: protectedProcedure
+    .input(
+      z.object({
+        start: z.date(),
+        end: z.date(),
+        dailyHours: z.array(z.number().min(0).max(23)),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const days = eachDayOfInterval({ start: input.start, end: input.end });
+      const slots: Omit<Slot, "id">[] = [];
+      days.forEach((day) => {
+        const daySlots = input.dailyHours.forEach((hours) =>
+          slots.push({
+            isFree: false,
+            serviceId: ctx.session.user.id,
+            date: addHours(day, hours),
+          })
+        );
+        return daySlots;
+      });
+
+      await ctx.prisma.slot.createMany({ data: slots });
     }),
 });

@@ -55,13 +55,22 @@ model Service {
     twitterId            String?
     isActive             Boolean
     autoBookingAccept    Boolean
-    bookingImageId       String?
-    bookingImage         Image?    @relation(fields: [bookingImageId], references: [id])
-    bookingTitle         String
-    Booking              Booking[]
+    serviceImageId       String?
+    serviceImage         Image?    @relation(fields: [serviceImageId], references: [id])
+    serviceTitle         String?
+    bookings             Booking[]
+    openSlots            Slot[]
     clientNumberRequired Boolean   @default(false)
 
     createdAt DateTime @default(now())
+}
+
+model Slot {
+    id        String   @id @default(cuid())
+    isFree    Boolean
+    date      DateTime
+    serviceId String
+    service   Service  @relation(fields: [serviceId], references: [id])
 }
 
 model Booking {
@@ -71,7 +80,7 @@ model Booking {
     clientAdditionalContact String
     clientInformation       String   @db.Text
     date                    DateTime
-    addedAt                 DateTime
+    addedAt                 DateTime @default(now())
     serviceId               String
 }
 
