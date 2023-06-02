@@ -13,6 +13,7 @@ import {
   subMonths,
 } from "date-fns";
 import React, { useEffect, useState } from "react";
+import { FiArrowLeft } from "react-icons/fi";
 
 const monthNames = [
   "Styczeń",
@@ -54,28 +55,32 @@ const Calendar = () => {
     );
   }, [firstDay]);
 
-  //   useEffect(() => {
-  //     console.log(currentDays);
-  //     addMo;
-  //   }, [currentDays]);
-
   return (
-    <div className="flex flex-col">
-      <div className="flex w-full">
-        <button onClick={handlePreviousMonth} className="grow bg-slate-200 p-2">
-          {"<"}
+    <div className="flex flex-col rounded-lg bg-secondary p-2 shadow-md shadow-black/40">
+      <div className="mb-2 grid w-full grid-cols-3 rounded-md bg-secondary text-light">
+        <button
+          onClick={handlePreviousMonth}
+          className="flex  items-center justify-center p-4 text-accent"
+        >
+          <FiArrowLeft className="" />
         </button>
-        <p className="flex grow items-center justify-center">
+        <p className="flex  items-center justify-center">
           {monthNames[firstDay.getMonth()]}
         </p>
-        <button onClick={handleNextMonth} className="grow bg-slate-200 p-2">
-          {">"}
+        <button
+          onClick={handleNextMonth}
+          className="flex  items-center justify-center p-4 text-accent"
+        >
+          <FiArrowLeft className="rotate-180" />
         </button>
       </div>
-      <div className="grid grid-cols-7">
+      <div className="grid grid-cols-7 gap-0.5">
         {currentDays.map((day) => {
           return (
-            <div className="bg-lime-200 p-2" key={getDayOfYear(day)}>
+            <div
+              className="flex aspect-square w-16 cursor-pointer items-center justify-center rounded-md bg-primary/80 p-4 text-light transition-colors hover:bg-primary"
+              key={getDayOfYear(day)}
+            >
               {day.getDate()}
             </div>
           );

@@ -11,7 +11,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {...props}
         ref={ref}
         className={clsx(
-          "flex h-10 w-full rounded-md border py-2 text-sm disabled:cursor-not-allowed disabled:opacity-60",
+          "flex h-10 w-full rounded-md border bg-accent px-1 py-2 text-sm font-semibold text-primary placeholder:text-primary/40 disabled:cursor-not-allowed disabled:opacity-60",
           className
         )}
       />
