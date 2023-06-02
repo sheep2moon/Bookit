@@ -44,7 +44,7 @@ model Account {
 model Service {
     id                   String    @id @default(cuid())
     name                 String
-    slug                 String
+    slug                 String    @unique
     ownerId              String    @unique
     owner                User      @relation(fields: [ownerId], references: [id])
     description          String    @db.Text

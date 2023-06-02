@@ -12,7 +12,7 @@ export const serviceRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.service.create({
+      return await ctx.prisma.service.create({
         data: {
           autoBookingAccept: false,
           description: "",
