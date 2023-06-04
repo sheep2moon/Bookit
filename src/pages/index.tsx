@@ -14,8 +14,9 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-primary">
-        <div className="">
+        <div className="flex flex-col gap-2 text-2xl font-bold text-light">
           <Link href="/auth/signin">Zaloguj</Link>
+          <Link href="/new-service">Nowy serwis</Link>
           <Calendar />
         </div>
       </main>

@@ -4,25 +4,31 @@ import Button from "../components/common/Button";
 import { FiArrowLeft } from "react-icons/fi";
 import { api } from "../utils/api";
 import { getServerAuthSession } from "../server/auth";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 
 const NewServicePage = () => {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [error, setError] = useState("");
 
   const { mutateAsync: createService } =
     api.service.createService.useMutation();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const res = createService({ name, slug });
-    console.log(res);
+    const res = await createService({ name, slug });
+    if (!res?.sucess) {
+      setError("Odnośnik jest już zajęty, spróbuj czegoś innego");
+    } else {
+      setError("");
+    }
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
   };
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // SHOULD CHECK IF SLUG IS AVAILABLE WITH DEBOUNCE
     setSlug(e.target.value.toLowerCase().replace(" ", "-"));
   };
 
@@ -30,7 +36,7 @@ const NewServicePage = () => {
     <div className="flex min-h-screen items-center bg-primary text-light">
       <div className="flex w-full justify-center pt-8">
         <form
-          onSubmit={handleSubmit}
+          onSubmit={(e) => void handleSubmit(e)}
           className="flex w-full max-w-md flex-col gap-2"
         >
           <label htmlFor="service-name">Nazwa twojego serwisu</label>
@@ -42,6 +48,7 @@ const NewServicePage = () => {
             placeholder="Nazwa serwisu"
           />
           <label htmlFor="service-slug">Odnośnik do twojego serwisu.</label>
+          {error && <p>{error}</p>}
           <Input
             name="service-slug"
             value={slug}
@@ -74,26 +81,25 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   // NOT LOGGED IN
   if (!session?.user) {
-    const queryMessage = new URLSearchParams(
-      "Musisz być zalogowany aby to zrobić"
-    ).toString();
-
     return {
       redirect: {
-        destination: `/auth/signin?message=${queryMessage}`,
+        destination: `/auth/signin?redirectTo=new-service`,
         permanent: false,
       },
     };
   }
+  // ALREADY HAVE A SERVICE
+  // IT WORKS BUT IS COMMENTED OUT FOR TEST
+  // if (session.user.serviceId) {
+  //   console.log(session.user);
 
-  if (session.user.serviceId) {
-    return {
-      redirect: {
-        destination: `/auth/manage`,
-        permanent: false,
-      },
-    };
-  }
+  //   return {
+  //     redirect: {
+  //       destination: `/`,
+  //       permanent: false,
+  //     },
+  //   };
+  // }
 
   return {
     props: {},

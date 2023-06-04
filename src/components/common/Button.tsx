@@ -15,7 +15,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             "bg-primary": variant === "primary",
             "border border-accent/10 bg-secondary shadow-md shadow-black/40 transition-all hover:border-accent/40":
               variant === "secondary",
-            "border border-secondary": variant === "outline",
+            "border border-accent bg-black/10": variant === "outline",
           },
           className
         )}

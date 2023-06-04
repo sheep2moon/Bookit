@@ -2,8 +2,24 @@ import { addHours, eachDayOfInterval } from "date-fns";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { z } from "zod";
 import type { Slot } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 export const serviceRouter = createTRPCRouter({
+  checkSlugAvailability: protectedProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const res = await ctx.prisma.service.findFirst({
+        where: {
+          slug: input.slug,
+        },
+      });
+      if (res) return true;
+      return false;
+    }),
   createService: protectedProcedure
     .input(
       z.object({
@@ -12,16 +28,27 @@ export const serviceRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      return await ctx.prisma.service.create({
-        data: {
-          autoBookingAccept: false,
-          description: "",
-          isActive: false,
-          name: input.name,
-          slug: input.slug,
-          ownerId: ctx.session.user.id,
-        },
-      });
+      try {
+        await ctx.prisma.service.create({
+          data: {
+            autoBookingAccept: false,
+            description: "",
+            isActive: false,
+            name: input.name,
+            slug: input.slug,
+            ownerId: ctx.session.user.id,
+          },
+        });
+        return { sucess: true };
+      } catch (error) {
+        console.log(error);
+
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === "P2002") {
+            return { sucess: false };
+          }
+        }
+      }
     }),
   setDescription: protectedProcedure
     .input(z.object({ description: z.string() }))
