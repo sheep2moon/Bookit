@@ -5,11 +5,13 @@ import { FiArrowLeft } from "react-icons/fi";
 import { api } from "../utils/api";
 import { getServerAuthSession } from "../server/auth";
 import type { GetServerSidePropsContext } from "next";
+import { useRouter } from "next/router";
 
 const NewServicePage = () => {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const { mutateAsync: createService } =
     api.service.createService.useMutation();
@@ -21,6 +23,7 @@ const NewServicePage = () => {
       setError("Odnośnik jest już zajęty, spróbuj czegoś innego");
     } else {
       setError("");
+      await router.push("/manage-service");
     }
   };
 

@@ -1,7 +1,7 @@
 import React from "react";
 
-const ś = () => {
-  return <div>ś</div>;
+const FillSlots = () => {
+  return <div></div>;
 };
 
-export default ś;
+export default FillSlots;
